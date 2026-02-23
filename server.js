@@ -17,9 +17,13 @@ app.post("/slack", async (req, res) => {
     if (text === "startwork") {
         await startTimer("Slack Work Session");
         await sendSlackMessage(req.body.channel_id, "Toggl Timer Started!");
+    } else if (text.startsWith("ask groq ")) {
+        const question = text.replace("ask groq ", "");
+        const response = await routeAI(question, "groq");
+        await sendSlackMessage(req.body.channel_id, response);
     } else if (text.startsWith("ask ")) {
         const question = text.replace("ask ", "");
-        const response = await routeAI(question);
+        const response = await routeAI(question, "gemini");
         await sendSlackMessage(req.body.channel_id, response);
     }
 
@@ -28,7 +32,11 @@ app.post("/slack", async (req, res) => {
 
 app.post("/whatsapp", async (req, res) => {
     const message = req.body.Body || "";
-    const response = await routeAI(message);
+    // Defaulting whatsapp to gemini, could use groq
+    const model = message.toLowerCase().startsWith("groq") ? "groq" : "gemini";
+    const prompt = message.toLowerCase().startsWith("groq") ? message.substring(5).trim() : message;
+
+    const response = await routeAI(prompt, model);
     res.send(`<Response><Message>${response}</Message></Response>`);
 });
 
