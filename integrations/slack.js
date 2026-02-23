@@ -1,4 +1,3 @@
-// integrations/slack.js
 const axios = require("axios");
 
 async function sendSlackMessage(channel, text) {

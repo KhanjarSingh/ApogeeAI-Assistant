@@ -8,7 +8,7 @@ async function askGroq(prompt) {
     try {
         const chatCompletion = await groq.chat.completions.create({
             messages: [{ role: "user", content: prompt }],
-            model: "llama-3.1-8b-instant", // Using a fast, free model
+            model: "llama-3.1-8b-instant",
         });
         return chatCompletion.choices[0].message.content;
     } catch (error) {
