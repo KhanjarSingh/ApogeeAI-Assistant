@@ -28,33 +28,33 @@ app.post("/slack", async (req, res) => {
 
     if (!text || !channel) return res.sendStatus(200);
 
-    const lowerText = text.toLowerCase();
-
-    if (lowerText.includes("startwork")) {
-
-        await startTimer("Slack Work Session");
-        await sendSlackMessage(channel, "Toggl Timer Started!");
-
-    } else if (lowerText.includes("stopwork")) {
-
-        await stopTimer();
-        await sendSlackMessage(channel, "Toggl Timer Stopped!");
-
-    } else if (lowerText.includes("ask groq ")) {
-
-        const question = text.substring(lowerText.indexOf("ask groq ") + 9);
-        const response = await routeAI(question, "groq");
-        await sendSlackMessage(channel, response);
-
-    } else if (lowerText.includes("ask ")) {
-
-        const question = text.substring(lowerText.indexOf("ask ") + 4);
-        const response = await routeAI(question, "gemini");
-        await sendSlackMessage(channel, response);
-
-    }
-
+    // Send immediate 200 OK to prevent Slack from retrying the request
     res.sendStatus(200);
+
+    // Process asynchronously in the background
+    (async () => {
+        try {
+            const lowerText = text.toLowerCase();
+
+            if (lowerText.includes("startwork")) {
+                await startTimer("Slack Work Session");
+                await sendSlackMessage(channel, "Toggl Timer Started!");
+            } else if (lowerText.includes("stopwork")) {
+                await stopTimer();
+                await sendSlackMessage(channel, "Toggl Timer Stopped!");
+            } else if (lowerText.includes("ask groq ")) {
+                const question = text.substring(lowerText.indexOf("ask groq ") + 9);
+                const response = await routeAI(question, "groq");
+                await sendSlackMessage(channel, response);
+            } else if (lowerText.includes("ask ")) {
+                const question = text.substring(lowerText.indexOf("ask ") + 4);
+                const response = await routeAI(question, "gemini");
+                await sendSlackMessage(channel, response);
+            }
+        } catch (error) {
+            console.error("Slack Background Processing Error:", error);
+        }
+    })();
 });
 
 app.post("/whatsapp", async (req, res) => {
