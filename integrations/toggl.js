@@ -6,8 +6,9 @@ async function startTimer(description) {
         {
             created_with: "OpenClaw Productivity Assistant",
             description: description,
-            workspace_id: process.env.TOGGL_WORKSPACE_ID,
-            duration: -1
+            workspace_id: parseInt(process.env.TOGGL_WORKSPACE_ID),
+            duration: -1,
+            start: new Date().toISOString()
         },
         {
             auth: {
